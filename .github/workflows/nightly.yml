@@ -30,7 +30,7 @@ jobs:
         run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Checkout EspoCRM
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v2
         with:
           repository: espocrm/espocrm
           ref: refs/heads/master
@@ -40,9 +40,9 @@ jobs:
         run: echo "version=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_ENV
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 16.20.2
 
       - name: NPM Install
         run: npm ci
