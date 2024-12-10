@@ -1,10 +1,23 @@
+---
+# -------------------------------------------------------------------------------------------------
+# Job Name
+# -------------------------------------------------------------------------------------------------
 name: nightly
 
+# -------------------------------------------------------------------------------------------------
+# When to run
+# -------------------------------------------------------------------------------------------------
 on:
+  # Runs manually
   workflow_dispatch:
+
+  # Runs daily
   schedule:
     - cron: '0 0 * * *'
 
+# -------------------------------------------------------------------------------------------------
+# What to run
+# -------------------------------------------------------------------------------------------------
 jobs:
   nightly:
     runs-on: ubuntu-22.04
@@ -17,7 +30,7 @@ jobs:
         run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Checkout EspoCRM
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.3.0
         with:
           repository: espocrm/espocrm
           ref: refs/heads/master
@@ -27,17 +40,12 @@ jobs:
         run: echo "version=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_ENV
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3.6.0
         with:
-          node-version: 22.12.0
+          node-version: 16
 
       - name: NPM Install
         run: npm ci
-
-      - name: Install Composer Dependencies
-        run: |
-          curl -sS https://getcomposer.org/installer | php
-          php composer.phar install --no-dev --ignore-platform-reqs
 
       - name: Full Build
         run: grunt
