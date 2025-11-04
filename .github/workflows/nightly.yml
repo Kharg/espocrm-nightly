@@ -59,9 +59,6 @@ jobs:
       - name: Full Build
         run: grunt
       
-      - name: Install frontend libs
-        run: grunt install
-      
       - name: Create a ZIP archive
         run: cd build/EspoCRM-* && zip --quiet --recurse-paths ../../EspoCRM-full.zip *
       
