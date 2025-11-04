@@ -1,4 +1,3 @@
----
 # -------------------------------------------------------------------------------------------------
 # Job Name
 # -------------------------------------------------------------------------------------------------
@@ -10,7 +9,7 @@ name: nightly
 on:
   # Runs manually
   workflow_dispatch:
-
+  
   # Runs daily
   schedule:
     - cron: '0 0 * * *'
@@ -21,51 +20,57 @@ on:
 jobs:
   nightly:
     runs-on: ubuntu-22.04
-
+    
     permissions:
       contents: write
-
+    
     steps:
       - name: Get current date
         run: echo "today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
+      
       - name: Checkout EspoCRM
         uses: actions/checkout@v4
         with:
           repository: espocrm/espocrm
           ref: refs/heads/master
           fetch-depth: 0
-
+      
       - name: Get latest version
         run: echo "version=$(git tag | sort --version-sort | tail -n1)" >> $GITHUB_ENV
-
+      
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      
+          
       - name: Setup PHP with Composer
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
           tools: composer:v2
           ini-values: memory_limit=1024M
-
+      
       - name: NPM Install
         run: npm ci
-
+      
+      - name: Composer Install
+        run: composer install --no-dev
+      
       - name: Full Build
         run: grunt
-
+      
+      - name: Install frontend libs
+        run: grunt install
+      
       - name: Create a ZIP archive
         run: cd build/EspoCRM-* && zip --quiet --recurse-paths ../../EspoCRM-full.zip *
-
+      
       - name: Create an Upgrade Package
         run: node diff ${{ env.version }}
-
+      
       - name: Rename an Upgrade Package
         run: mv build/EspoCRM-upgrade-*.zip EspoCRM-upgrade.zip
-
+      
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
